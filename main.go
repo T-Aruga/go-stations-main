@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/TechBowl-japan/go-stations/db"
+	"github.com/TechBowl-japan/go-stations/handler"
 )
 
 func main() {
@@ -50,18 +51,20 @@ func realMain() error {
 
 	// set http handlers
 	mux := http.NewServeMux()
-	mux.Handle("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Healthcheck success")
-	}))
 
 	// TODO: ここから実装を行う
-	server := &http.Server{
-		Addr:    ":8080",
+	healthzHandler := handler.NewHealthzHandler()
+	mux.Handle("/healthz", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		healthzHandler.ServeHTTP(w, r)
+	}))
+
+	srv := &http.Server{
+		Addr:    defaultPort,
 		Handler: mux,
 	}
 
 	fmt.Println("Server listen port 8080.....")
-	err = server.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		return err
 	}
