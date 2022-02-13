@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -49,8 +50,21 @@ func realMain() error {
 
 	// set http handlers
 	mux := http.NewServeMux()
+	mux.Handle("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Healthcheck success")
+	}))
 
 	// TODO: ここから実装を行う
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+
+	fmt.Println("Server listen port 8080.....")
+	err = server.ListenAndServe()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
