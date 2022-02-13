@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -63,7 +62,6 @@ func realMain() error {
 		Handler: mux,
 	}
 
-	fmt.Println("Server listen port 8080.....")
 	err = srv.ListenAndServe()
 	if err != nil {
 		return err
