@@ -49,7 +49,6 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
 		w.WriteHeader(http.StatusOK)
 
 		encoder := json.NewEncoder(w)
