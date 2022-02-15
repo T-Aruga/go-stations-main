@@ -24,7 +24,6 @@ func NewTODOHandler(svc *service.TODOService) *TODOHandler {
 
 // ServeHTTP implements http.Handler interface.
 func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
 
 	switch r.Method {
@@ -50,6 +49,7 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
 
 		encoder := json.NewEncoder(w)
 
