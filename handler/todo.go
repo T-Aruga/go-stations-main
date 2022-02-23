@@ -29,61 +29,58 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		size := r.URL.Query().Get("size")
 		var err error
-		size64 := int64(5)
+		todoReq := &model.ReadTODORequest{Size: model.DEFAULT_READTODO_SIZE}
+
+		size := r.URL.Query().Get("size")
 		if size != "" {
-			size64, err = strconv.ParseInt(size, 10, 64)
+			todoReq.Size, err = strconv.ParseInt(size, 10, 64)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 		}
 
-		prevId := r.URL.Query().Get("prev_id")
-		prevId64 := int64(0)
-		if prevId != "" {
-			prevId64, err = strconv.ParseInt(prevId, 10, 64)
+		prevID := r.URL.Query().Get("prev_id")
+		if prevID != "" {
+			todoReq.PrevID, err = strconv.ParseInt(prevID, 10, 64)
 			if err != nil {
-				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 		}
-		request := &model.ReadTODORequest{Size: size64, PrevID: prevId64}
 
-		response, err := h.Read(ctx, request)
+		response, err := h.Read(ctx, todoReq)
 		if err != nil {
 			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		encoder := json.NewEncoder(w)
-
-		if err := encoder.Encode(response); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 
 	case http.MethodPost:
 		decoder := json.NewDecoder(r.Body)
-		var request model.CreateTODORequest
-		err := decoder.Decode(&request)
+		var todoReq model.CreateTODORequest
+		err := decoder.Decode(&todoReq)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if request.Subject == "" {
+		if todoReq.Subject == "" {
 			log.Println("Subject not found")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		res, err := h.Create(ctx, &request)
+		res, err := h.Create(ctx, &todoReq)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
@@ -92,49 +89,45 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 
-		encoder := json.NewEncoder(w)
-
-		err = encoder.Encode(res)
+		err = json.NewEncoder(w).Encode(res)
 		if err != nil {
 			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 	case http.MethodPut:
 		decoder := json.NewDecoder(r.Body)
-		var request model.UpdateTODORequest
-		err := decoder.Decode(&request)
+		var todoReq model.UpdateTODORequest
+		err := decoder.Decode(&todoReq)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
 			return
 		}
-		if request.ID == 0 {
+		if todoReq.ID == 0 {
 			log.Println("ID not found")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if request.Subject == "" {
+		if todoReq.Subject == "" {
 			log.Println("Subject not found")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		response, err := h.Update(ctx, &request)
+		response, err := h.Update(ctx, &todoReq)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		encoder := json.NewEncoder(w)
-		w.Header().Set("Content-Type", "application/json")
-
-		err = encoder.Encode(response)
+		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
 			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	default:

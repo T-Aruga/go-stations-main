@@ -2,6 +2,10 @@ package model
 
 import "time"
 
+const (
+	DEFAULT_READTODO_SIZE int64 = 5
+)
+
 type (
 	// A TODO expresses ...
 	TODO struct {
