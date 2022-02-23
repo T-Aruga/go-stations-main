@@ -2,6 +2,10 @@ package model
 
 import "time"
 
+const (
+	DEFAULT_READTODO_SIZE int64 = 5
+)
+
 type (
 	// A TODO expresses ...
 	TODO struct {
@@ -23,9 +27,14 @@ type (
 	}
 
 	// A ReadTODORequest expresses ...
-	ReadTODORequest struct{}
+	ReadTODORequest struct {
+		PrevID int64 `json:"prev_id"`
+		Size   int64 `json:"size"`
+	}
 	// A ReadTODOResponse expresses ...
-	ReadTODOResponse struct{}
+	ReadTODOResponse struct {
+		TODOs []*TODO `json:"todos"`
+	}
 
 	// A UpdateTODORequest expresses ...
 	UpdateTODORequest struct {
