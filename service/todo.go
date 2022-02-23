@@ -65,6 +65,7 @@ func (s *TODOService) ReadTODO(ctx context.Context, prevID, size int64) ([]*mode
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	todos := make([]*model.TODO, 0, size)
 	for rows.Next() {
