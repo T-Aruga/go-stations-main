@@ -61,9 +61,18 @@ func (s *TODOService) ReadTODO(ctx context.Context, prevID, size int64) ([]*mode
 		readWithID = `SELECT id, subject, description, created_at, updated_at FROM todos WHERE id < ? ORDER BY id DESC LIMIT ?`
 	)
 	var rows *sql.Rows
-	rows, err := s.readQueryCtx(ctx, read, prevID, size)
-	if err != nil {
-		return nil, err
+	if prevID == 0 {
+		rs, err := s.readQueryCtx(ctx, read, prevID, size)
+		if err != nil {
+			return nil, err
+		}
+		rows = rs
+	} else {
+		rs, err := s.readQueryCtx(ctx, readWithID, prevID, size)
+		if err != nil {
+			return nil, err
+		}
+		rows = rs
 	}
 	defer rows.Close()
 
@@ -78,7 +87,7 @@ func (s *TODOService) ReadTODO(ctx context.Context, prevID, size int64) ([]*mode
 
 		todos = append(todos, todo)
 	}
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
