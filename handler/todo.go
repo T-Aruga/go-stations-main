@@ -58,17 +58,14 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
 		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
 	case http.MethodPost:
-		decoder := json.NewDecoder(r.Body)
 		var todoReq model.CreateTODORequest
-		err := decoder.Decode(&todoReq)
+		err := json.NewDecoder(r.Body).Decode(&todoReq)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
@@ -87,17 +84,14 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
 		err = json.NewEncoder(w).Encode(res)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	case http.MethodPut:
-		decoder := json.NewDecoder(r.Body)
 		var todoReq model.UpdateTODORequest
-		err := decoder.Decode(&todoReq)
+		err := json.NewDecoder(r.Body).Decode(&todoReq)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
@@ -122,8 +116,6 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
 		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
 			log.Println(err)
