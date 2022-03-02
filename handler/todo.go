@@ -139,9 +139,9 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		response, err := h.Delete(ctx, &todoReq)
 		if err != nil {
-			var ErrNotFound *model.ErrNotFound
+			var errNotFound *model.ErrNotFound
 			switch {
-			case errors.As(err, &ErrNotFound):
+			case errors.As(err, &errNotFound):
 				w.WriteHeader(http.StatusNotFound)
 			default:
 				w.WriteHeader(http.StatusInternalServerError)

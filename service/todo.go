@@ -149,7 +149,7 @@ func (s *TODOService) DeleteTODO(ctx context.Context, ids []int64) error {
 	}
 	defer stmt.Close()
 
-	args := []interface{}{}
+	args := make([]interface{}, 0, len(ids))
 	for _, id := range ids {
 		args = append(args, id)
 	}
