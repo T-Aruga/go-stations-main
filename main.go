@@ -8,6 +8,7 @@ import (
 
 	"github.com/TechBowl-japan/go-stations/db"
 	"github.com/TechBowl-japan/go-stations/handler"
+	"github.com/TechBowl-japan/go-stations/handler/middleware"
 	"github.com/TechBowl-japan/go-stations/service"
 )
 
@@ -55,6 +56,9 @@ func realMain() error {
 	// TODO: ここから実装を行う
 	healthzHandler := handler.NewHealthzHandler()
 	mux.Handle("/healthz", healthzHandler)
+
+	panicHandler := handler.NewPanicHandler()
+	mux.Handle("/do-panic", middleware.Recovery(panicHandler))
 
 	todoSvc := service.NewTODOService(todoDB)
 	todoHandler := handler.NewTODOHandler(todoSvc)
