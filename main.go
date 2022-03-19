@@ -55,14 +55,14 @@ func realMain() error {
 
 	// TODO: ここから実装を行う
 	healthzHandler := handler.NewHealthzHandler()
-	mux.Handle("/healthz", healthzHandler)
+	mux.Handle("/healthz", middleware.OS(middleware.Logger(healthzHandler)))
 
 	panicHandler := handler.NewPanicHandler()
 	mux.Handle("/do-panic", middleware.Recovery(panicHandler))
 
 	todoSvc := service.NewTODOService(todoDB)
 	todoHandler := handler.NewTODOHandler(todoSvc)
-	mux.Handle("/todos", todoHandler)
+	mux.Handle("/todos", middleware.OS(middleware.Logger(todoHandler)))
 
 	srv := &http.Server{
 		Addr:    defaultPort,
